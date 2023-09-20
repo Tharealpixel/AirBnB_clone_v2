@@ -242,30 +242,32 @@ class HBNBCommand(cmd.Cmd):
         return " ".join(i for i in new_list)
 
     def default(self, line):
-        """retrieve all instances of a class and
-        retrieve the number of instances
-        """
-        my_list = line.split('.')
-        if len(my_list) >= 2:
-            if my_list[1] == "all()":
-                self.do_all(my_list[0])
-            elif my_list[1] == "count()":
-                self.count(my_list[0])
-            elif my_list[1][:4] == "show":
-                self.do_show(self.strip_clean(my_list))
-            elif my_list[1][:7] == "destroy":
-                self.do_destroy(self.strip_clean(my_list))
-            elif my_list[1][:6] == "update":
-                args = self.strip_clean(my_list)
+        """Retrieve all instances of a class and retrieve the number of instances"""
+        command_parts = line.split('.')
+        if len(command_parts) >= 2:
+            class_name = command_parts[0]
+            method_name = command_parts[1]
+
+            if method_name == "all()":
+                self.do_all(class_name)
+            elif method_name == "count()":
+                self.count(class_name)
+            elif method_name.startswith("show"):
+                self.do_show(self.strip_clean(command_parts))
+            elif method_name.startswith("destroy"):
+                self.do_destroy(self.strip_clean(command_parts))
+            elif method_name.startswith("update"):
+                args = self.strip_clean(command_parts)
                 if isinstance(args, list):
-                    obj = storage.all()
-                    key = args[0] + ' ' + args[1]
-                    for k, v in args[2].items():
-                        self.do_update(key + ' "{}" "{}"'.format(k, v))
+                    object_key = args[0] + ' ' + args[1]
+                    updates = args[2]
+                    for key, value in updates.items():
+                        self.do_update(f'{object_key} "{key}" "{value}"')
                 else:
                     self.do_update(args)
         else:
             cmd.Cmd.default(self, line)
+
 
 
 if __name__ == '__main__':
